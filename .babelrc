@@ -1,0 +1,25 @@
+// .babelrc
+{
+  //   "presets": [
+  //     [
+  //       "@babel/preset-env",
+  //       {
+  //         "useBuiltIns": "usage", // or "entry"
+  //         "corejs": 3
+  //       }
+  //     ]
+  //   ],
+  "plugins": [
+    "babel-plugin-styled-components",
+    [
+      "module-resolver",
+      {
+        "root": ["./src/"],
+        "alias": {
+          "images": "./public/images",
+          "/*": "./src"
+        }
+      }
+    ]
+  ]
+}

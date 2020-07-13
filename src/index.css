@@ -1,0 +1,35 @@
+@import "../node_modules/normalize.css";
+
+html,
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+    "Noto Color Emoji" !important;
+}
+html {
+  scroll-behavior: smooth !important;
+}
+*,
+::before,
+::after {
+  box-sizing: border-box; /* 1 */
+}
+body {
+  background-color: #fff;
+  color: #000;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit !important;
+  text-decoration: none;
+}
+*:focus {
+  outline: none;
+}
+ol,
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
