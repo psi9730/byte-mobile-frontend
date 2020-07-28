@@ -1,19 +1,18 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 import {
-  border,
-  borderRadius,
-  width,
-  maxWidth,
-  maxHeight,
-  height,
-  color,
-  backgroundColor,
-  justifyContent,
-  padding,
-} from 'styled-system';
+    border,
+    borderRadius,
+    width,
+    maxWidth,
+    maxHeight,
+    height,
+    color,
+    justifyContent,
+    padding,
+} from "styled-system";
 // import styled from 'styled-components';
-const BUTTON = styled('button')`
+const BUTTON = styled("button")`
   /* object-fit: contain;
   max-height: 100%;
   height: auto; */
@@ -22,7 +21,6 @@ const BUTTON = styled('button')`
   ${border}
   ${width}
   ${color}
-  ${backgroundColor}
   ${height}
   ${justifyContent}
   ${maxHeight}
@@ -31,14 +29,13 @@ const BUTTON = styled('button')`
 `;
 
 BUTTON.defaultProps = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  maxHeight: '100%',
-  height: 'auto',
-  objectFit: 'contain',
-  border: 'none',
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    maxHeight: "100%",
+    height: "auto",
+    objectFit: "contain",
+    border: "none",
 };
-export default function Button({ onClick, ...props }) {
-  return <BUTTON {...props} className="button" onClick={onClick} />;
-}
+
+export default BUTTON;

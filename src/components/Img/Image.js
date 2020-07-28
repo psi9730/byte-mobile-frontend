@@ -1,8 +1,27 @@
-import React from "react"
-import { Picture } from "/components/Img"
-import { makeImageSrcSet } from "/utils"
+import styled from "styled-components";
+import {
+    border,
+    compose,
+    flexbox,
+    layout,
+    space,
+    system,
+    borderRadius,
+} from "styled-system";
 
-export default function Img({ src, ...props }) {
-  const image = makeImageSrcSet(src)
-  return <Picture src={image[0]} srcSet={image[1]} {...props} />
-}
+const Img = styled("img")(
+    {
+        display: "block",
+    },
+    system({
+        filter: true,
+    }),
+    compose(space, layout, border, flexbox, borderRadius)
+);
+Img.displayName = "Img";
+
+Img.defaultProps = {
+    width: "100%",
+};
+
+export default Img;

@@ -1,14 +1,11 @@
-import React from "react"
-import { BrowserRouter as Router } from "react-router-dom"
-import App from "./shared/App"
-import useApi, { ApiProvider } from "react-use-api"
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import App from "./shared/App";
 
 const Root = () => (
-  <ApiProvider>
     <Router>
-      <App />
+        <App />
     </Router>
-  </ApiProvider>
-)
+);
 
-export default Root
+export default Root;
