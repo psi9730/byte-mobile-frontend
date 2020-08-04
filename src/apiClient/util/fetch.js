@@ -1,25 +1,25 @@
-import HttpError from './HttpError';
-import { stringify } from 'query-string';
+import HttpError from "./HttpError";
+import { stringify } from "query-string";
 
 export const fetchJson = (url, options = {}) => {
     const requestHeaders =
         options.headers ||
         new Headers({
-            Accept: 'application/json',
+            Accept: "application/json",
         });
     if (
-        !requestHeaders.has('Content-Type') &&
+        !requestHeaders.has("Content-Type") &&
         !(options && options.body && options.body instanceof FormData)
     ) {
-        requestHeaders.set('Content-Type', 'application/json');
+        requestHeaders.set("Content-Type", "application/json");
     }
     if (options.user && options.user.authenticated && options.user.token) {
-        requestHeaders.set('Authorization', options.user.token);
+        requestHeaders.set("Authorization", options.user.token);
     }
 
     return fetch(url, { ...options, headers: requestHeaders })
-        .then(response =>
-            response.text().then(text => ({
+        .then((response) =>
+            response.text().then((text) => ({
                 status: response.status,
                 statusText: response.statusText,
                 headers: response.headers,
@@ -48,7 +48,7 @@ export const fetchJson = (url, options = {}) => {
 
 export const queryParameters = stringify;
 
-const isValidObject = value => {
+const isValidObject = (value) => {
     if (!value) {
         return false;
     }
@@ -56,7 +56,7 @@ const isValidObject = value => {
     const isArray = Array.isArray(value);
     const isBuffer = Buffer.isBuffer(value);
     const isObject =
-        Object.prototype.toString.call(value) === '[object Object]';
+        Object.prototype.toString.call(value) === "[object Object]";
     const hasKeys = !!Object.keys(value).length;
 
     return !isArray && !isBuffer && isObject && hasKeys;
@@ -66,12 +66,12 @@ export const flattenObject = (value, path = []) => {
     if (isValidObject(value)) {
         return Object.assign(
             {},
-            ...Object.keys(value).map(key =>
+            ...Object.keys(value).map((key) =>
                 flattenObject(value[key], path.concat([key]))
             )
         );
     } else {
-        return path.length ? { [path.join('.')]: value } : value;
+        return path.length ? { [path.join(".")]: value } : value;
     }
 };
 

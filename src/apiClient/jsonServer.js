@@ -24,7 +24,7 @@ import { handleUpload } from "./upload";
  * CREATE       => POST http://my.api.url/posts/123
  * DELETE       => DELETE http://my.api.url/posts/123
  */
-export default (apiUrl, httpClient = fetchJson) => {
+export default (apiUrl, options, httpClient = fetchJson) => {
     /**
      * @param {String} type One of the constants appearing at the top if this file, e.g. 'UPDATE'
      * @param {String} resource Name of the resource to fetch, e.g. 'posts'
@@ -41,7 +41,7 @@ export default (apiUrl, httpClient = fetchJson) => {
         switch (type) {
             case GET_LIST: {
                 const { offset, limit } = params.pagination;
-                const { field, order } = params.sort;
+                const { field = "created_at", order = "desc" } = params.sort;
                 // const query = {
                 //     ...flattenObject(params.filter),
                 //     _sort: field,
@@ -51,13 +51,26 @@ export default (apiUrl, httpClient = fetchJson) => {
                 // };
                 const query = {
                     ...flattenObject(params.filter),
-                    _sort: field,
-                    _order: order,
+                    sort: JSON.stringify({ field, order }),
                     offset: offset,
                     limit: limit,
                 };
 
-                url = `${apiUrl}/${resource}/?${stringify(query)}`;
+                const replacer = (key, value) =>
+                    value instanceof Object && !(value instanceof Array)
+                        ? Object.keys(value)
+                              .sort()
+                              .reduce((sorted, key) => {
+                                  sorted[key] = value[key];
+                                  return sorted;
+                              }, {})
+                        : value;
+                url = `${apiUrl}/${resource}/?${stringify(
+                    query,
+                    function replacer(key, value) {
+                        return value;
+                    }
+                )}`;
                 break;
             }
             case GET_ONE:
@@ -133,7 +146,7 @@ export default (apiUrl, httpClient = fetchJson) => {
                     ),
                 };
             case CREATE:
-                return { data: { ...params.data, id: data.id } };
+                return { data: { ...params.data } };
             default:
                 return { data: data };
         }
@@ -168,14 +181,13 @@ export default (apiUrl, httpClient = fetchJson) => {
                 handleUpload(resource, params);
             }
         }
-
         const { url, options } = convertRESTRequestToHTTP(
             type,
             resource,
             params
         );
-        return httpClient(url, options).then((response) =>
-            convertHTTPResponseToREST(response, type, resource, params)
-        );
+        return httpClient(url, options).then((response) => {
+            return convertHTTPResponseToREST(response, type, resource, params);
+        });
     };
 };

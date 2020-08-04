@@ -1,5 +1,3 @@
-import amplitude from "amplitude-js";
-
 export const makeImageSrcSet = (path, rootDir = "/images/") => {
     const [filename, fileExtension] = path.split(".");
     return [

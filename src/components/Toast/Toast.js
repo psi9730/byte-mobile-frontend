@@ -8,7 +8,7 @@ const Container = styled(Box)`
     right: 8%;
     border-radius: 50%;
     position: fixed;
-    z-index: 10;
+    z-index: 1000;
     overflow: hidden;
     background-color: ${(props) => props.theme.colors.white};
 `;

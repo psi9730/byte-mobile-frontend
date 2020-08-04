@@ -4,12 +4,10 @@ const HoverImage = ({ hoverSrc, src, ...props }) => {
     const [imageSrc, setImageSrc] = useState(src);
     const mouseOver = useCallback(() => {
         setImageSrc(hoverSrc);
-        console.log(src);
     }, [hoverSrc]);
 
     const mouseOut = useCallback(() => {
         setImageSrc(src);
-        console.log(src);
     }, [src]);
     const onClick = (e) => {
         e.stopPropagation();

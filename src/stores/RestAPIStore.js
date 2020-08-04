@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import jsonServerRestClient from "/api/jsonServer";
+import jsonServerRestClient from "/apiClient/jsonServer";
 
 const RestAPIContext = React.createContext(null);
 

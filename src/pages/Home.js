@@ -9,10 +9,11 @@ import { useHistory } from "react-router-dom";
 import styled, { css } from "styled-components";
 import { Box } from "components/Common";
 import { Toast } from "/components/Toast";
-import { Deck } from "/containers/Home/presentationals";
+import { Deck } from "/containers/Home/containers";
 import useIntersectionObserver from "hooks/useIntersectionObserver";
+import useLocalStorage from "hooks/useLocalStorage";
 import { RestAPIContext } from "stores";
-
+import { getArticles } from "../services/Article";
 const Container = styled(Box)`
     width: 100%;
     height: 100%;
@@ -63,23 +64,31 @@ const Home = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [datas, setDatas] = useState([]);
-
+    const [deckIndex, setDeckIndex] = useState(0);
     const [currentDatas, setCurrentDatas] = useState([]);
+    const [likes, setLikes] = useLocalStorage("likes", []);
+
     const offset = useRef(0);
     const rootRef = useRef(null);
     const targetRef = useRef(null);
 
-    const limit = 20;
+    const limit = 3;
+    useEffect(() => {
+        if (offset.current + limit - deckIndex < limit / 2) {
+            loadMoreData();
+        }
+    }, [deckIndex]);
     const loadData = useCallback(async () => {
         try {
             setLoading(true);
-            const fetchData = await RestAPI("GET_LIST", `articles`, {
+            const fetchData = await getArticles({
                 pagination: {
                     offset: offset.current,
                     limit: limit,
                 },
                 sort: { field: "created_at", order: "desc" },
-            }).then((res) => res.data);
+            });
+            console.log(fetchData);
             setCurrentDatas(fetchData);
             return fetchData;
         } catch (e) {
@@ -112,16 +121,22 @@ const Home = () => {
     useEffect(() => {
         const fetchData = async () => {
             const result = await loadData();
-            result.length > 0 && setDatas(result);
+            result && result.length > 0 && setDatas(result);
         };
         fetchData();
     }, [loadData]);
 
     return datas.length > 0 ? (
         <Container pt={["40px", "60px"]}>
-            <DeckContainer width="100%" height="100%" mt={["48px", "64px"]}>
+            <DeckContainer width="100%" height="100%" mt={["32px", "48px"]}>
                 <DeckInnerContainer>
-                    <Deck datas={datas} />
+                    <Deck
+                        likes={likes}
+                        setLikes={setLikes}
+                        datas={datas}
+                        deckIndex={deckIndex}
+                        setDeckIndex={setDeckIndex}
+                    />
                 </DeckInnerContainer>
             </DeckContainer>
             <Toast

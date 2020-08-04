@@ -11,13 +11,13 @@ const Container = styled(Box)`
 `;
 
 const CategoryDetailInfo = ({ data }) => {
-    console.log(data);
     return data ? (
         <>
             <HorizontalCard
                 mt="24px"
                 ml="24px"
                 mr="24px"
+                key={data.id}
                 data={{
                     id: data.id,
                     category: data.category,

@@ -58,7 +58,7 @@ const CategoryDetailListContainer = ({ id }) => {
         } finally {
             setLoading(false);
         }
-    }, [RestAPI]);
+    }, [RestAPI, id]);
     const loadMoreData = useCallback(async () => {
         if (datas.length > 0) {
             offset.current = offset.current + limit;
@@ -80,7 +80,11 @@ const CategoryDetailListContainer = ({ id }) => {
     useEffect(() => {
         const fetchData = async () => {
             const data = await loadData();
-            data && data.length > 0 && setDatas(data);
+            if (data) {
+                setDatas(data);
+            } else {
+                setDatas([]);
+            }
         };
 
         fetchData();

@@ -15,6 +15,7 @@ if (typeof document !== "undefined" && !document.lazyLoadInstance) {
         elements_selector: "img.lazy",
     });
 }
+
 const AbsoluteContainer = styled(Flex)`
     flex-direction: column;
     width: 100%;
@@ -35,16 +36,12 @@ const AbsoluteCategoryContainer = styled(Box)`
     justify-content: flex-end;
     align-items: flex-start;
 `;
-const AbsoluteLikeContainer = styled(Box)`
+const AbsoluteLike = styled(Box)`
     position: absolute;
     /* bottom: 0px; */
     right: 18px;
     top: 18px;
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    align-items: flex-start;
+    z-index: 10;
 `;
 /**
  * Art Direction과 Resolution Switching을 지원하기 위한 반응형 이미지 컴포넌트입니다.
@@ -61,7 +58,9 @@ const ImageWithTextBoxCard = ({
     hover = false,
     scale = false,
     data,
+    like,
     onClickLink,
+    onClickLike,
     cardWidth = 200,
     cardHeight = 316,
     imageWidth = 100,
@@ -88,7 +87,6 @@ const ImageWithTextBoxCard = ({
 
     const hasSize =
         typeof imageHeight === "number" && typeof imageWidth === "number";
-
     return (
         /* TODO: 최 외곽의 div 역할은 picture 요소로도 충분할 것 같습니다. */
         <Box
@@ -101,6 +99,7 @@ const ImageWithTextBoxCard = ({
             css={css`
                 position: relative;
                 overflow: hidden;
+                background-color: white;
                 transform: translateZ(0);
                 ${hover && darkenHover};
                 overflow: hidden;
@@ -145,12 +144,22 @@ const ImageWithTextBoxCard = ({
                                 <Text textStyle="p3">{data.category}</Text>
                             </Button>
                         </AbsoluteCategoryContainer>
-                        <AbsoluteLikeContainer width={["24px", "24px", "60px"]}>
-                            <HoverImg
-                                src="bookmark.png"
-                                hoverSrc="bookmark_fill.png"
-                            />
-                        </AbsoluteLikeContainer>
+                        <AbsoluteLike
+                            width={["24px", "24px", "60px"]}
+                            onClick={onClickLike}
+                        >
+                            {like ? (
+                                <Img
+                                    src="bookmark_fill.png"
+                                    backgroundColor="transparent"
+                                />
+                            ) : (
+                                <Img
+                                    src="bookmark.png"
+                                    backgroundColor="transparent"
+                                />
+                            )}
+                        </AbsoluteLike>
                     </Box>
                     <Flex
                         flex="1 1 0"
@@ -159,7 +168,7 @@ const ImageWithTextBoxCard = ({
                         alignItems="flex-start"
                         backgroundColor="white"
                     >
-                        <Box m="18px">
+                        <Box m="9px 18px">
                             <Text fontWeight="bold" textStyle="h4">
                                 {data.title}
                             </Text>
@@ -173,7 +182,6 @@ const ImageWithTextBoxCard = ({
                                 {data.description}
                             </LineClamp>
                         </Box>
-                        <Box></Box>
                     </Flex>
                 </AbsoluteContainer>
             </a>

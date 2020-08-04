@@ -23,7 +23,7 @@ const LoadingContainer = styled(Box)`
     justify-content: center;
     align-items: center;
 `;
-const CategoryArticle = ({ keyword }) => {
+const CategoryArticle = () => {
     const history = useHistory();
 
     let RestAPI = useContext(RestAPIContext);
