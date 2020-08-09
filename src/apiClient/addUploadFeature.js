@@ -23,7 +23,6 @@ const imageParams = [
     "square_image_url",
 ];
 const addUploadFeature = (requestHandler) => (type, resource, params) => {
-    console.log(params);
     if ((type === "CREATE" || type === "UPDATE") && resource === "categories") {
         // notice that following condition can be true only when `<ImageInput source="pictures" />` component has parameter `multiple={true}`
         // if parameter `multiple` is false, then data.pictures is not an array, but single object
@@ -33,13 +32,14 @@ const addUploadFeature = (requestHandler) => (type, resource, params) => {
             }
             return false;
         });
+
         const formerPictures = filterImageParams.filter(
             (p) => !(params.data[p].rawFile.rawFile instanceof File)
         );
         const newPictures = filterImageParams.filter(
             (p) => params.data[p].rawFile.rawFile instanceof File
         );
-        console.log(newPictures);
+
         return Promise.all(
             newPictures.map((imageParam) => {
                 return convertFileToBase64(params.data[imageParam]);

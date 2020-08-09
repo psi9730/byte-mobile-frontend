@@ -44,7 +44,7 @@ const CategoryCard = ({
             {...props}
             className={clsx("item-card", props.className)}
             data-styles_id={data.id}
-            onClick={() => onClickLink(data.original_article_url)}
+            onClick={() => onClickLink(data.original_article_url, data.id)}
             backgroundColor="white"
             position="relative"
         >
@@ -63,7 +63,7 @@ const CategoryCard = ({
                     border="none"
                 >
                     <AbsoluteLike
-                        width={["24px", "24px", "42px"]}
+                        width={["24px", "24px", "36px"]}
                         onClick={onClickLike}
                     >
                         {like ? (

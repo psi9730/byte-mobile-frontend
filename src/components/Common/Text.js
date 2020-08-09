@@ -57,6 +57,7 @@ const Text = styled("p")(
         margin: 0,
     },
     system({
+        cursor: true,
         wordBreak: true,
     }),
     compose(

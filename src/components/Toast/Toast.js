@@ -10,6 +10,7 @@ const Container = styled(Box)`
     position: fixed;
     z-index: 1000;
     overflow: hidden;
+    cursor: pointer;
     background-color: ${(props) => props.theme.colors.white};
 `;
 const Toast = ({ data, imageHeight, imageWidth, ...props }) => {

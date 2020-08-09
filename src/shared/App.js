@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import { Route, Switch } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import { Home, About, Explore } from "/pages";
-import { ModalProvider, RestAPIProvider } from "/stores";
+import { ModalProvider } from "/stores";
 import { MainHeader } from "/components/Header";
 import { lightTheme as desktopLightTheme } from "/styles/theme/desktop";
 
@@ -22,20 +22,18 @@ class App extends Component {
     componentDidMount() {}
     render() {
         return (
-            <RestAPIProvider>
-                <ModalProvider>
-                    <ThemeProvider theme={desktopLightTheme}>
-                        <Container>
-                            <MainHeader />
-                            <Switch>
-                                <Route exact path="/" component={Home} />
-                                <Route path="/about" component={About} />
-                                <Route path="/explore" component={Explore} />
-                            </Switch>
-                        </Container>
-                    </ThemeProvider>
-                </ModalProvider>
-            </RestAPIProvider>
+            <ModalProvider>
+                <ThemeProvider theme={desktopLightTheme}>
+                    <Container>
+                        <MainHeader />
+                        <Switch>
+                            <Route exact path="/" component={Home} />
+                            <Route path="/about" component={About} />
+                            <Route path="/explore" component={Explore} />
+                        </Switch>
+                    </Container>
+                </ThemeProvider>
+            </ModalProvider>
         );
     }
 }

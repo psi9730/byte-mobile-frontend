@@ -13,10 +13,14 @@ const CategoryDetailCard = ({
     showLikes = true,
     showReviews = true,
     isWebview = false,
+    onClick,
     ...props
 }) => {
     return data.image_url ? (
-        <a href={data.original_article_url}>
+        <a
+            onClick={() => onClick(data.original_article_url, data.id)}
+            // href={data.original_article_url}
+        >
             <Flex
                 {...props}
                 flexDirection="row"

@@ -19,6 +19,7 @@ const CategoryCard = ({
     imageHeight = 316,
     imageVariant = "responsive",
     compact = false,
+    onClick,
     ...props
 }) => {
     return (
@@ -27,8 +28,9 @@ const CategoryCard = ({
             className={clsx("item-card", props.className)}
             data-styles_id={data.id}
             position="relative"
+            onClick={onClick}
         >
-            <a className="item-card__link" href={data.original_article_url}>
+            <a className="item-card__link">
                 <ImageCard
                     alt={data.id}
                     bg="alpha.black12"
@@ -44,7 +46,7 @@ const CategoryCard = ({
                         <Box py={compact ? "6px" : "12px"} mr="12px" ml="6px">
                             <Text
                                 color="white"
-                                textStyle="h5"
+                                textStyle={["h5", "h5", "h4"]}
                                 textAlign="center"
                             >
                                 {data.title}

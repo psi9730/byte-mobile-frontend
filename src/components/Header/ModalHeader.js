@@ -18,6 +18,7 @@ const Container = styled(Box)`
 const LogoContainer = styled(Box)`
     position: absolute;
     left: 24px;
+    cursor: pointer;
 `;
 const NavText = styled(Text)`
     padding-bottom: 3px;
@@ -47,7 +48,7 @@ const Header = ({ title, onClick, ...props }) => {
             width="100%"
             {...props}
             height={["60px", "80px"]}
-            p={["0px 35px", "0px 35px", "0px 50px", "0px 175px"]}
+            p={["0px 35px", "0px 35px", "0px 50px", "0px 80px"]}
         >
             <LogoContainer onClick={onClick}>
                 <Img src="left_arrow.png" width={["24px", "24px", "30px"]} />

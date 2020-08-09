@@ -5,12 +5,14 @@ import React, {
     useCallback,
     useMemo,
 } from "react";
-import { useSprings, animated, interpolate } from "react-spring";
-
-import { useDrag } from "react-use-gesture";
+import { useSprings, useSpring, animated, interpolate } from "react-spring";
+import { useGesture } from "react-use-gesture";
 import { CardB, CardA } from "/containers/Home/presentationals";
 import { transform } from "typescript";
 import { likeArticle } from "/services/Article";
+import { debounce } from "lodash";
+import { postEvent } from "../../../services/Event";
+
 // These two are just helpers, they curate spring data, values that are later being interpolated into css
 const height = 2000;
 const maxLength = 200;
@@ -93,7 +95,11 @@ const Deck = ({ likes, setLikes, datas, deckIndex, setDeckIndex }) => {
         setHeight(ref.current.clientHeight);
     }, []);
 
-    const onClickLink = (url) => {
+    const onClickLink = (url, id) => {
+        postEvent({
+            event_name: "click_card_full",
+            parameters: { article_id: id },
+        });
         window.location.href = url;
     };
 
@@ -116,7 +122,6 @@ const Deck = ({ likes, setLikes, datas, deckIndex, setDeckIndex }) => {
             return likes.includes(data.id);
         });
     }, [likes, datas]);
-
     useEffect(() => {
         set((i) => {
             if (underList.has(i)) {
@@ -155,87 +160,104 @@ const Deck = ({ likes, setLikes, datas, deckIndex, setDeckIndex }) => {
     })); // Create a bunch of springs using the helpers above
 
     // Create a gesture, we're interested in down-state, delta (current-pos - click-pos), direction and velocity
-    const bind = useDrag(({ down, movement: [, my], velocity }) => {
-        const dir = my < 0 ? -1 : 1; // Direction should either point up or down
-        const upper = (velocity > 0.2 && dir === -1) || my < -200; // If you flick hard enough it should trigger the card to fly out
-        const under = (velocity > 0.2 && dir === 1) || my > 200;
-        const customMy =
-            my > innitialHeight
-                ? innitialHeight
-                : my < -innitialHeight
-                ? -innitialHeight
-                : my;
-        // const upper = my < -100; // If you flick hard enough it should trigger the card to fly out
-        // const under = my > 100;
+    const bind = useGesture({
+        onDrag: ({ down, movement: [, my], velocity }) => {
+            const dir = my < 0 ? -1 : 1; // Direction should either point up or down
+            const upper = (velocity > 0.2 && dir === -1) || my < -200; // If you flick hard enough it should trigger the card to fly out
+            const under = (velocity > 0.2 && dir === 1) || my > 200;
+            const customMy =
+                my > innitialHeight
+                    ? innitialHeight
+                    : my < -innitialHeight
+                    ? -innitialHeight
+                    : my;
+            // const upper = my < -100; // If you flick hard enough it should trigger the card to fly out
+            // const under = my > 100;
 
-        if (!down && under && deckIndex !== 0) {
-            underList.add(deckIndex); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
-            upperList.delete(deckIndex - 1);
-            setDeckIndex(deckIndex - 1);
-        }
-        if (!down && upper && deckIndex !== datas.length - 1) {
-            underList.delete(deckIndex + 1); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
-            upperList.add(deckIndex);
-            setDeckIndex(deckIndex + 1);
-        }
+            if (!down && under && deckIndex !== 0) {
+                underList.add(deckIndex); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
+                upperList.delete(deckIndex - 1);
+                setDeckIndex(deckIndex - 1);
+            }
+            if (!down && upper && deckIndex !== datas.length - 1) {
+                underList.delete(deckIndex + 1); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
+                upperList.add(deckIndex);
+                setDeckIndex(deckIndex + 1);
+            }
 
-        set((i) => {
-            // if (index !== i) return; // We're only interested in changing spring-data for the current spring
-            if (down) {
-                if (dir === UP && deckIndex !== datas.length - 1) {
-                    if (i === deckIndex) {
-                        const opacity = 1 + customMy / height;
-                        const scale = 1 + customMy / height;
-                        // const y = cardIndex - i;
-                        return { opacity, scale };
-                    } else if (i >= deckIndex + 1) {
-                        // const y = `calc(${100 * (i - cardIndex)}% + ${my}px)`;
-                        // const y = `${height * (i - cardIndex) + my}px`;
-                        const y = customMy;
-                        return { y };
-                    } else {
-                        const opacity = 0;
-                        const y = 0;
-                        const scale = 1 + customMy / height;
-                        // const y = cardIndex - i;
-                        return { opacity, scale };
-                    }
-                } else if (dir === DOWN && deckIndex !== 0) {
-                    if (i >= deckIndex) {
-                        const y = customMy;
-                        return { y };
-                    } else if (i === deckIndex - 1) {
-                        const opacity = (1 + customMy / height) / 3;
-                        const scale = (1 + customMy / height) / 1.5;
-                        return { opacity, scale };
-                    } else {
-                        const opacity = 0;
-                        const scale = 0.7;
-                        return { opacity, scale };
+            set((i) => {
+                // if (index !== i) return; // We're only interested in changing spring-data for the current spring
+                if (down) {
+                    if (dir === UP && deckIndex !== datas.length - 1) {
+                        if (i === deckIndex) {
+                            const opacity = 1 + customMy / height;
+                            const scale = 1 + customMy / height;
+                            // const y = cardIndex - i;
+                            return { opacity, scale };
+                        } else if (i >= deckIndex + 1) {
+                            // const y = `calc(${100 * (i - cardIndex)}% + ${my}px)`;
+                            // const y = `${height * (i - cardIndex) + my}px`;
+                            const y = customMy;
+                            return { y };
+                        } else {
+                            const opacity = 0;
+                            const y = 0;
+                            const scale = 1 + customMy / height;
+                            // const y = cardIndex - i;
+                            return { opacity, scale };
+                        }
+                    } else if (dir === DOWN && deckIndex !== 0) {
+                        if (i >= deckIndex) {
+                            const y = customMy;
+                            return { y };
+                        } else if (i === deckIndex - 1) {
+                            const opacity = (1 + customMy / height) / 3;
+                            const scale = (1 + customMy / height) / 1.5;
+                            return { opacity, scale };
+                        } else {
+                            const opacity = 0;
+                            const scale = 0.7;
+                            return { opacity, scale };
+                        }
                     }
                 }
-            }
-            if (underList.has(i)) {
-                if (Math.min(...Array.from(underList.values())) === i) {
-                    const y = 0;
-                    const heightIndex = i - deckIndex;
+                if (underList.has(i)) {
+                    if (Math.min(...Array.from(underList.values())) === i) {
+                        const y = 0;
+                        const heightIndex = i - deckIndex;
+                        const scale = 1;
+                        const opacity = 1;
+                        return { y, scale, opacity, heightIndex };
+                    }
+                } else if (upperList.has(i)) {
+                    // const heightIndex = 0;
+                    // const scale = 0.7;
+                    // const opacity = 0;
+                    // const y = 0;
+                    // return { scale, opacity, heightIndex, y };
+                } else {
                     const scale = 1;
                     const opacity = 1;
-                    return { y, scale, opacity, heightIndex };
+                    const y = 0;
+                    return { scale, opacity, y };
                 }
-            } else if (upperList.has(i)) {
-                // const heightIndex = 0;
-                // const scale = 0.7;
-                // const opacity = 0;
-                // const y = 0;
-                // return { scale, opacity, heightIndex, y };
-            } else {
-                const scale = 1;
-                const opacity = 1;
-                const y = 0;
-                return { scale, opacity, y };
+            });
+        },
+        onWheelEnd: ({ offset: [, y], movement: [, my], velocity }) => {
+            const dir = my < 0 ? -1 : 1; // Direction should either point up or down
+            const under = (velocity > 0.2 && dir === -1) || my < 0; // If you flick hard enough it should trigger the card to fly out
+            const upper = (velocity > 0.2 && dir === 1) || my > 0;
+            if (under && deckIndex !== 0) {
+                underList.add(deckIndex); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
+                upperList.delete(deckIndex - 1);
+                setDeckIndex(deckIndex - 1);
             }
-        });
+            if (upper && deckIndex !== datas.length - 1) {
+                underList.delete(deckIndex + 1); // If button/finger's up and trigger velocity is reached, we flag the card ready to fly out
+                upperList.add(deckIndex);
+                setDeckIndex(deckIndex + 1);
+            }
+        },
     });
     // Now we're just mapping the animated values to our view, that's it. Btw, this component only renders once. :-)
     return props.map(({ x, y, heightIndex = 0, scale, opacity, zIndex }, i) => {

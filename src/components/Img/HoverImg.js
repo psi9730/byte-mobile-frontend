@@ -11,7 +11,6 @@ const HoverImage = ({ hoverSrc, src, ...props }) => {
     }, [src]);
     const onClick = (e) => {
         e.stopPropagation();
-        console.log("Panel Clicked");
     };
     return (
         <Img

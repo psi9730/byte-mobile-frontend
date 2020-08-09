@@ -93,7 +93,7 @@ const ImageWithTextBoxCard = ({
             width={width ? width : "100%"}
             height={height ? height : "100%"}
             boxShadow={boxShadow}
-            onClick={() => onClickLink(data.original_article_url)}
+            onClick={() => onClickLink(data.original_article_url, data.id)}
             borderRadius={borderRadius}
             {...props}
             css={css`
@@ -145,7 +145,7 @@ const ImageWithTextBoxCard = ({
                             </Button>
                         </AbsoluteCategoryContainer>
                         <AbsoluteLike
-                            width={["24px", "24px", "60px"]}
+                            width={["24px", "24px", "36px"]}
                             onClick={onClickLike}
                         >
                             {like ? (

@@ -3,7 +3,7 @@ import styled, { css } from "styled-components";
 import { Box, Text } from "/components/Common";
 import { useForm, Controller } from "react-hook-form";
 import { TextInput, Select, Rank } from "/components/Input";
-import { RestAPIContext } from "stores";
+import { postSurvey } from "../services/About";
 
 import { Button } from "/components/Button";
 const Container = styled(Box)`
@@ -78,7 +78,6 @@ const defaultValues = {
 };
 
 const About = () => {
-    let RestAPI = useContext(RestAPIContext);
     const { handleSubmit, register, setValue, errors, control } = useForm({
         defaultValues,
     });
@@ -88,7 +87,7 @@ const About = () => {
 
     const onSubmit = async (data) => {
         try {
-            const fetchData = await RestAPI("CREATE", "survey", { data }).then(
+            const fetchData = await postSurvey({ data }).then(
                 (res) => res.data
             );
             alert(

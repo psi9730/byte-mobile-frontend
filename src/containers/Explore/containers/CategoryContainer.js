@@ -8,46 +8,6 @@ import { HoverButton } from "/components/Button";
 import { CategoryArticleContainer } from "/containers/Explore/containers";
 
 const CategoryContainer = () => {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [datas, setDatas] = useState([
-        {
-            id: 1,
-            category: "병아리",
-        },
-        {
-            id: 2,
-            category: "최신",
-        },
-        {
-            id: 3,
-            category: "IT",
-        },
-    ]);
-
-    const loadData = useCallback(async () => {
-        try {
-            setLoading(true);
-            const datas = await request
-                .getList(`/tag/`)
-                .then((res) => res.data);
-            return datas;
-        } catch (e) {
-            setError(e);
-        } finally {
-            setLoading(false);
-            return [];
-        }
-    }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const result = await loadData();
-            result.length > 0 && setDatas(result);
-        };
-
-        fetchData();
-    }, [loadData]);
     return (
         <Box p="48px 0px 0px">
             {/* <Text

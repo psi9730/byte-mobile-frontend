@@ -5,18 +5,19 @@ const baseOption = {
     threshold: 0.5,
     rootMargin: "0px",
 };
-const useIntersect = (onIntersect, id, loadMore, option = baseOption) => {
+const useIntersect = (onIntersect, loadMore, option = baseOption) => {
     const [ref, setRef] = useState(null);
+
     const checkIntersect = useCallback(
         ([entry], observer) => {
             if (entry.isIntersecting) {
-                onIntersect(entry, observer, id, loadMore);
+                onIntersect(entry, observer);
             }
         },
-        [id, loadMore]
+        [onIntersect]
     );
     useEffect(() => {
-        let observer;
+        var observer;
         if (ref) {
             observer = new IntersectionObserver(checkIntersect, {
                 ...option,

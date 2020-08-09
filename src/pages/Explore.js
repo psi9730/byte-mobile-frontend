@@ -36,8 +36,8 @@ const Explore = () => {
 
     useEffect(() => {
         if (search && "category" in search) {
-            modal[1](true);
             categoryId[1](search.category);
+            modal[1](true);
         } else {
             modal[1](false);
         }

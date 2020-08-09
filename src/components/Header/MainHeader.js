@@ -4,6 +4,7 @@ import { Box, Flex, Text } from "/components/Common";
 import { Link } from "react-router-dom";
 import { Img } from "/components/Common";
 import { useHistory, useLocation } from "react-router-dom";
+import { postEvent } from "../../services/Event";
 
 // import Drawer from "./Drawer";
 
@@ -13,7 +14,10 @@ const Container = styled(Box)`
     justify-content: space-between;
     align-items: center;
     position: absolute;
+    z-index: 10;
     top: 0px;
+    /* position: ${(props) =>
+        props.pathname === "/" ? "fixed" : "absolute"}; */
 `;
 const Logo = styled(Img)`
     animation: fadein 1s;
@@ -25,9 +29,11 @@ const Logo = styled(Img)`
             opacity: 1;
         }
     }
+    cursor: pointer;
 `;
 const NavText = styled(Text)`
     padding-bottom: 3px;
+    cursor: pointer;
     color: ${(props) =>
         props.active ? props.theme.colors.purple : props.theme.colors.gray40};
     transition: 1s;
@@ -70,13 +76,19 @@ const Header = () => {
     };
     const history = useHistory();
     const onClickNav = (nav) => {
+        if (nav === "") {
+            postEvent({ event_name: "click_page_home" });
+        } else if (nav === "explore") {
+            postEvent({ event_name: "click_category_home" });
+        }
         history.push(nav);
     };
     return (
         <Container
+            pathname={pathname}
             width="100%"
             height={["60px", "80px"]}
-            p={["0px 35px", "0px 35px", "0px 50px", "0px 175px"]}
+            p={["0px 35px", "0px 35px", "0px 50px", "0px 50px"]}
         >
             <Link to={`/`}>
                 <Logo src="byte_logo.png" width={["60px", "60px", "68px"]} />

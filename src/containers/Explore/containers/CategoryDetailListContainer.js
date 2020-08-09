@@ -11,8 +11,9 @@ import styled, { css } from "styled-components";
 import request from "/utils/request";
 import { Box, Flex, Text, ImgNoSrc } from "/components/Common";
 import { CategoryDetailCard } from "/components/StyleCard";
-import { RestAPIContext } from "stores";
 import useIntersect from "hooks/useIntersectionObserver";
+import { getArticlesByCategory } from "../../../services/Article";
+import { postEvent } from "services/Event";
 
 const LoadingContainer = styled(Box)`
     padding: 10px 0px;
@@ -26,69 +27,64 @@ const Container = styled(Box)`
 `;
 
 const CategoryDetailListContainer = ({ id }) => {
-    const history = useHistory();
-
-    let RestAPI = useContext(RestAPIContext);
-    const onClickToast = () => {
-        history.push("/about");
-    };
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [datas, setDatas] = useState([]);
     const [loadMore, setLoadMore] = useState(true);
     const offset = useRef(0);
-    const rootRef = useRef(null);
-    const targetRef = useRef(null);
-
     const limit = 2;
-    const onIntersect = useCallback(async (entry, observer, id, loadMore) => {
-        if (loadMore) {
-            observer.unobserve(entry.target);
-            await loadMoreData(id);
-            observer.observe(entry.target);
-        }
-    });
-
-    const [_, setRef] = useIntersect(onIntersect, id, loadMore);
+    const onIntersect = useCallback(
+        async (entry, observer) => {
+            if (loadMore) {
+                observer.unobserve(entry.target);
+                await loadMoreData({ id });
+                observer.observe(entry.target);
+            }
+        },
+        [loadMoreData, id, loadMore]
+    );
+    const onClickLink = (url, id) => {
+        postEvent({
+            event_name: "click_card_mini",
+            params: { article_id: id },
+        });
+        window.location.href = url;
+    };
+    const [_, setRef] = useIntersect(onIntersect);
 
     const loadMoreData = useCallback(
-        async (id) => {
-            const data = await loadData(id);
+        async (params) => {
+            const data = await loadData({ id: params.id });
             if (data && data.length > 0) {
                 setDatas((datas) => datas.concat(data));
                 offset.current = offset.current + limit;
-            } else setLoadMore(false);
-        },
-        [loadData, offset, id]
-    );
-
-    const loadData = useCallback(
-        async (id) => {
-            try {
-                setLoading(true);
-
-                const fetchData = await RestAPI(
-                    "GET_LIST",
-                    `categories/` + id + "/articles",
-                    {
-                        id,
-                        pagination: {
-                            offset: offset.current,
-                            limit: limit,
-                        },
-                        sort: { field: "created_at", order: "desc" },
-                    }
-                ).then((res) => res.data);
-                return fetchData;
-            } catch (e) {
-                setError(e);
-                setLoading(false);
-            } finally {
-                setLoading(false);
+            } else {
+                setLoadMore(false);
             }
         },
-        [RestAPI]
+        [loadData]
     );
+
+    const loadData = useCallback(async (params) => {
+        try {
+            setLoading(true);
+
+            const fetchData = await getArticlesByCategory({
+                id: params.id,
+                pagination: {
+                    offset: offset.current,
+                    limit: limit,
+                },
+                sort: { field: "created_at", order: "desc" },
+            });
+            return fetchData;
+        } catch (e) {
+            setError(e);
+            setLoading(false);
+        } finally {
+            setLoading(false);
+        }
+    });
 
     // useIntersectionObserver({
     //     root: rootRef.current,
@@ -112,6 +108,11 @@ const CategoryDetailListContainer = ({ id }) => {
 
     useEffect(() => {
         offset.current = 0;
+        postEvent({
+            event_name: "view_category_article",
+            params: { category_id: id },
+        });
+
         return () => {
             setDatas([]);
             setLoadMore(true);
@@ -122,19 +123,14 @@ const CategoryDetailListContainer = ({ id }) => {
         return null;
     }
     return (
-        <Box>
-            <Flex
-                ref={rootRef}
-                flexDirection="column"
-                mt="24px"
-                ml="24px"
-                mr="24px"
-            >
+        <Container>
+            <Flex flexDirection="column" mt="24px" ml="24px" mr="24px">
                 {datas.map((_data) => (
                     <CategoryDetailCard
                         css={`
                             margin-bottom: 24px;
                         `}
+                        onClick={onClickLink}
                         key={_data.id}
                         data={{
                             id: _data.id,
@@ -153,7 +149,7 @@ const CategoryDetailListContainer = ({ id }) => {
                     )}
                 </LoadingContainer>
             </div>
-        </Box>
+        </Container>
     );
 };
 
